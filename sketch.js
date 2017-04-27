@@ -5,26 +5,25 @@
 
 var mapimg;
 
-var clat = 0;
-var clon = 0;
+// Center the map over the United States
+var clat = -100;
+var clon = 50;
 
-var ww = 1024;
-var hh = 512;
+// Set the map size as large as possible
+var ww = 1280;
+var hh = 900;
 
-var zoom = 1;
-//var earthquakes;
+// Set a reasonable zoom level that will show all of the US
+var zoom = 3;
+
 var stns;
-
-
-
 
 function preload() {
   mapimg = loadImage('https://api.mapbox.com/styles/v1/mapbox/dark-v9/static/' +
     clat + ',' + clon + ',' + zoom + '/' +
     ww + 'x' + hh +
     '?access_token=pk.eyJ1IjoiY29kaW5ndHJhaW4iLCJhIjoiY2l6MGl4bXhsMDRpNzJxcDh0a2NhNDExbCJ9.awIfnl6ngyHoB3Xztkzarw');
-  // earthquakes = loadStrings('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.csv');
-  //earthquakes = loadStrings('all_month.csv');
+
   stns = loadStrings('tcd_data_K231.csv'); // generate this csv file from MATLAB
 }
 
@@ -39,7 +38,7 @@ function mercY(lat) {
   lat = radians(lat);
   var a = (256 / PI) * pow(2, zoom);
   var b = tan(PI / 4 + lat / 2);
-  var c = PI - log(b);
+  var c = PI - log(abs(b));
   return a * c;
 }
 
@@ -81,11 +80,10 @@ function setup() {
 }
 /*
 next steps:
-get basemap that is centered on USA, 
-adjust the formulas to map lat/lon to 
-the appropriate x,y pos on the canvas.
-
-restructure the code to avoid redundant computations in parsing the csv file
+-restructure the code to avoid redundant computations in parsing the csv file
+-animate the points over time or wrst mouse position in the draw() method
+-split up the data into smaller subsets and load them on-demand
+-get a mapbox api token or use a different map provider
 */
 
 
