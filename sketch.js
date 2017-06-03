@@ -32,7 +32,7 @@ function preload() {
     ww + 'x' + hh +
     '?access_token=pk.eyJ1IjoiY29kaW5ndHJhaW4iLCJhIjoiY2l6MGl4bXhsMDRpNzJxcDh0a2NhNDExbCJ9.awIfnl6ngyHoB3Xztkzarw');
 
-  data = loadStrings('tcd_data_K231.csv'); // generate this csv file from MATLAB
+  data = loadStrings('tcd_data_K231_2f_no_pipes.csv'); // generate this csv file from MATLAB
 }
 
 function mercX(lon) {
@@ -80,7 +80,8 @@ function setup() {
     //we assume that the tcd data starts at the column with index 5
     //and that all of the remaining columns contain tcd data
     for(var j = 5; j < stns[i-1].length; j++) {
-      stns[i-1][j] = stns[i-1][j].split('|');
+      //split the tcd data at every 4th character
+      stns[i-1][j] = stns[i-1][j].trim().match(/.{1,4}/g);
     }
   }
 }
