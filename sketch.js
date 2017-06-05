@@ -32,7 +32,8 @@ function preload() {
     ww + 'x' + hh +
     '?access_token=pk.eyJ1IjoiY29kaW5ndHJhaW4iLCJhIjoiY2l6MGl4bXhsMDRpNzJxcDh0a2NhNDExbCJ9.awIfnl6ngyHoB3Xztkzarw');
 
-  data = loadStrings('tcd_data_K231_2f_no_pipes.csv'); // generate this csv file from MATLAB
+  data = loadStrings('alternate_tcd_data/tcd_data_K231_0_100_rescale_no_pipes.csv'); // generate this csv file from MATLAB
+
 }
 
 function mercX(lon) {
@@ -50,6 +51,13 @@ function mercY(lat) {
   return a * c;
 }
 
+function convert_index2date(index){
+  var start_date = moment("19811226", "YYYYMMDD");
+  
+  var my_date = moment(start_date).add(index,'days');
+  my_date = moment(my_date).format('L');
+  return my_date;
+}
 
 function setup() {
   //create the radio button and options
@@ -58,7 +66,7 @@ function setup() {
   for(var j = 5; j < headerrow.length; j++) {
     radio.option(headerrow[j], j);
   }
-  radio.value(5);  //set the default value
+  radio.value(6);  //set the default value
 
   //create the canvas
   createCanvas(ww, hh);
@@ -81,7 +89,10 @@ function setup() {
     //and that all of the remaining columns contain tcd data
     for(var j = 5; j < stns[i-1].length; j++) {
       //split the tcd data at every 4th character
-      stns[i-1][j] = stns[i-1][j].trim().match(/.{1,4}/g);
+
+      stns[i-1][j] = stns[i-1][j].trim().match(/[0-9]{1,3}/g);
+
+
     }
   }
 }
@@ -105,17 +116,51 @@ function draw() {
     var y = mercY(stns[i][1]) - cy;
     
     //calculate the color based on the tcd_tmin from the array
-    var val = map(tcd,0,1,0,240);
+    var val = map(tcd,0,100,0,240);
     stroke(val, 100, 100, 100);
-    fill(val, 100, 100, 100);
+    fill(val, 100, 100, 50);
     ellipse(x, y, diameter, diameter);
   }
   
+  //INSERT COLOR-BAR
+  num_bins = 100;
+  //hue range is [0,240]
+  //values [0,1]
+  var cbar_width = 10;
+  var cbar_height = 2;
+  //position relative to the centered coords
+  var x_pos_fixed = 380;  
+  var upper_y_pos_fixed = -100;
+  //color-bar rectangles seqn
+  for (var i=0; i < num_bins; i++){
+    var val = map(i,0,100,0,240);
+    stroke(val, 100, 100, 100);
+      fill(val, 100, 100, 100);
+      rect(x_pos_fixed,upper_y_pos_fixed+i*cbar_height,cbar_width,cbar_height);
+  }
+  var x_text_pos = x_pos_fixed + cbar_width + 6;
+  var lower_y_text_pos = upper_y_pos_fixed + num_bins*cbar_height;
+  var my_sat = 50;
+  var my_text_size = 14;
+  textSize(my_text_size);
+  fill(0, my_sat, 100, 100);
+  text("High GC", x_text_pos, upper_y_pos_fixed+my_text_size);
+  fill(240, my_sat, 100, 100);
+  text("Low GC", x_text_pos, lower_y_text_pos);
+  //
+
   //update our observations index
   //assumes that all stations have the same number of observations
   index = (index + 1) % stns[0][5].length;
-  document.getElementById('counter').innerHTML= index;
+  index2 = convert_index2date(index);
+  document.getElementById('counter').innerHTML= index2;
+
+
+
 }
+
+// http-server -p 8089 (nodeJS local server)
+// localhost:8089
 
 /*
 next steps:
