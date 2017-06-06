@@ -59,20 +59,37 @@ function convert_index2date(index){
   return my_date;
 }
 
+function hmg_mean(my_array){
+  //input an array such as stns[0][5]
+  //compute the mean value
+  var total=0;
+  for (var i=0; i < my_array.length; i++){
+    total += parseInt(my_array[i], 10);
+  }
+  avg = total / my_array.length;
+  return avg;
+}
+
+// these global variables get values in setup
+var mean_tcd_tmin = [];
+var mean_tcd_tmax = [];
+
 function setup() {
   //create the radio button and options
-  radio = createRadio('radio');
   var headerrow = data[0].split(/,/);
-  for(var j = 5; j < headerrow.length; j++) {
-    radio.option(headerrow[j], j);
-  }
-  radio.value(6);  //set the default value
+  
+  radio = createRadio('radio');
+  radio.option("GC Daily Min Temperatures", 5);
+  radio.option("GC Daily Max Temperatures", 6);
+  radio.option("35-YR Mean GC for Daily Min", 7);
+  radio.option("35-YR Mean GC for Daily Max", 8);
 
+  radio.value(5);  //set the default value
   //create the canvas
   createCanvas(ww, hh);
- 
+
   //draw the map
-  translate(width / 2, height / 2);
+  translate(width / 2, height / 2); //this essentially translates the coordinate system for the canvas
   imageMode(CENTER);
   colorMode(HSB);
   image(mapimg, 0, 0);
@@ -87,41 +104,14 @@ function setup() {
     stns[i-1] = data[i].split(/,/);
     //we assume that the tcd data starts at the column with index 5
     //and that all of the remaining columns contain tcd data
-    for(var j = 5; j < stns[i-1].length; j++) {
+    for (var j = 5; j < stns[i-1].length; j++) {
       //split the tcd data at every 4th character
 
-      stns[i-1][j] = stns[i-1][j].trim().match(/[0-9]{1,3}/g);
-
+      stns[i-1][j] = stns[i-1][j].trim().match(/[0-9]{3}/g);
+      
 
     }
   }
-}
-
-//initialize the index for looping over our observations
-var index = 0;
-
-function draw() {
-  //translate the origin to the center of the map
-  translate(width / 2, height / 2);
-  
-  //get the value of the radio button to determine the selected tcd value
-  var radioval = radio.value();
-  
-  //iterate over the stations and draw the points for the selected tcd value
-  for (var i = 0; i < stns.length; i++) {
-    var tcd = stns[i][radioval][index];
-
-    //get the lat and lon from the parsed CSV array
-    var x = mercX(stns[i][2]) - cx;
-    var y = mercY(stns[i][1]) - cy;
-    
-    //calculate the color based on the tcd_tmin from the array
-    var val = map(tcd,0,100,0,240);
-    stroke(val, 100, 100, 100);
-    fill(val, 100, 100, 50);
-    ellipse(x, y, diameter, diameter);
-  }
-  
   //INSERT COLOR-BAR
   num_bins = 100;
   //hue range is [0,240]
@@ -149,13 +139,77 @@ function draw() {
   text("Low GC", x_text_pos, lower_y_text_pos);
   //
 
+  //compute mean-tcd values
+  for (var i = 0; i < stns.length; i++) {
+    mean_tcd_tmin.push(hmg_mean(stns[i][5]));
+    mean_tcd_tmax.push(hmg_mean(stns[i][6]));
+  }
+
+
+}
+
+//initialize the index for looping over our observations
+var index = 0;
+
+function draw() {
+  //translate the origin to the center of the map
+  translate(width / 2, height / 2);
+  
+  //get the value of the radio button to determine the selected tcd value
+  var radioval = radio.value();
+  
+  if(radioval == 5 || radioval == 6){
+    //iterate over the stations and draw the points for the selected tcd value
+    for (var i = 0; i < stns.length; i++) {
+      var tcd = stns[i][radioval][index];
+
+      //get the lat and lon from the parsed CSV array
+      var x = mercX(stns[i][2]) - cx;
+      var y = mercY(stns[i][1]) - cy;
+      
+      //calculate the color based on the tcd_tmin from the array
+      var val = map(tcd,0,100,0,240);
+      stroke(val, 100, 100, 100);
+      fill(val, 100, 100, 50);
+      ellipse(x, y, diameter, diameter);
+    }
+  }
+
+  // Plot Mean Values
+  if(radioval == 7 || radioval == 8){
+    //iterate over the stations and draw the points for the selected tcd value
+    for (var i = 0; i < stns.length; i++) {
+
+      if(radioval == 7){
+        var tcd = mean_tcd_tmin[i];
+      } else {
+        var tcd = mean_tcd_tmax[i];
+      }
+      
+      //get the lat and lon from the parsed CSV array
+      var x = mercX(stns[i][2]) - cx;
+      var y = mercY(stns[i][1]) - cy;
+      
+      //calculate the color based on the tcd_tmin from the array
+      var val = map(tcd,0,100,0,240);
+      stroke(val, 100, 100, 50);
+      fill(val, 100, 100, 50);
+      ellipse(x, y, diameter, diameter);
+    }
+  }
+
   //update our observations index
   //assumes that all stations have the same number of observations
   index = (index + 1) % stns[0][5].length;
-  index2 = convert_index2date(index);
-  document.getElementById('counter').innerHTML= index2;
 
-
+  var date_text_size = 20;
+  var date_text_x_pos = -100;
+  var date_text_y_pos = 0;
+  fill(0,100,0,10);
+  rect(date_text_x_pos,date_text_y_pos-date_text_size,120,date_text_size+5);
+  fill(0,0,100);
+  textSize(date_text_size)
+  text(convert_index2date(index),date_text_x_pos+10,date_text_y_pos);
 
 }
 
