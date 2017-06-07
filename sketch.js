@@ -81,8 +81,8 @@ function setup() {
   radio = createRadio('radio');
   radio.option("GC Daily Min Temperatures", 5);
   radio.option("GC Daily Max Temperatures", 6);
-  radio.option("35-YR Mean GC for Daily Min", 7);
-  radio.option("35-YR Mean GC for Daily Max", 8);
+  radio.option("35YR Mean GC for Daily Min", 7);
+  radio.option("35YR Mean GC for Daily Max", 8);
 
   radio.value(5);  //set the default value
   //create the canvas
@@ -206,10 +206,15 @@ function draw() {
   var date_text_x_pos = -100;
   var date_text_y_pos = 0;
   fill(0,100,0,10);
-  rect(date_text_x_pos,date_text_y_pos-date_text_size,120,date_text_size+5);
+  rect(date_text_x_pos,date_text_y_pos-date_text_size,140,date_text_size+5);
   fill(0,0,100);
   textSize(date_text_size)
-  text(convert_index2date(index),date_text_x_pos+10,date_text_y_pos);
+  if (radioval == 5 || radioval == 6){
+    text(convert_index2date(index),date_text_x_pos+20,date_text_y_pos);
+  } else {
+    text("35YR Mean",date_text_x_pos+20,date_text_y_pos);
+  }
+  
 
 }
 
