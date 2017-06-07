@@ -30,7 +30,7 @@ function preload() {
   mapimg = loadImage('https://api.mapbox.com/styles/v1/mapbox/dark-v9/static/' +
     clon + ',' + clat + ',' + zoom + '/' +
     ww + 'x' + hh +
-    '?access_token=pk.eyJ1IjoiY29kaW5ndHJhaW4iLCJhIjoiY2l6MGl4bXhsMDRpNzJxcDh0a2NhNDExbCJ9.awIfnl6ngyHoB3Xztkzarw');
+    '?access_token=pk.eyJ1IjoiaGFtemFnaGFkeWFsaSIsImEiOiJjajFjZzRyNDUwMDFoMzNwZDc1bXVnZDExIn0.dvLHReanaisYxqEvTfrCpw');
 
   data = loadStrings('alternate_tcd_data/tcd_data_K231_0_100_rescale_no_pipes.csv'); // generate this csv file from MATLAB
 
@@ -224,7 +224,7 @@ function draw() {
 /*
 next steps:
 -split up the data into smaller subsets and load them on-demand
--get a mapbox api token or use a different map provider
+-get a mapbox api token or use a different map provider (DONE)
 */
 
 
