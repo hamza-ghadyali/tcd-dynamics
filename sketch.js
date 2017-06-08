@@ -1,7 +1,4 @@
-// Daniel Shiffman
-// http://codingtra.in
-// Earthquake Data Viz
-// Video: https://youtu.be/ZiYdOwOrGyc
+// Hamza Ghadyali
 
 var mapimg;
 
